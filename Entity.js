@@ -6,7 +6,7 @@ const EntityState = {
 };
 
 class Entity {
-    constructor(name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position = { x: 0, y: 0 }) {
+    constructor(name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position = { x: 0, y: 0 }, animations = null) {
         this.name = name || "???";
         this.hp = hp || 0;
         this.maxHp = maxHp || 0;
@@ -19,6 +19,8 @@ class Entity {
         this.transform = new Transform(position, { x: 1, y: 1 }, { rot: 0 });
         this.currentState = EntityState.WANDERING;
         this.targetPosition = { x: this.transform.vector2D.position.x, y: this.transform.vector2D.position.y };
+        this.animations = animations;
+        this.currentAnimation = null;
         this.distanceTraveled = 0;
         this.size = 10;
 
@@ -96,5 +98,32 @@ State: ${this.currentState}
 `;
 
         return debugInfo;
+    }
+
+    setAnimation(animationTitle) {
+        const animation = this.animations.getAnimation(animationTitle);
+        if (animation) {
+            this.currentAnimation = animation;
+        }
+    }
+
+    updateAnimation(currentTime) {
+        if (this.currentAnimation) {
+            const elapsedTime = currentTime - this.currentAnimation.lastFrameTime;
+            const frameDuration = 1000 / this.currentAnimation.framesPerSecond;
+
+            if (elapsedTime >= frameDuration) {
+                this.currentAnimation.currentFrame = (this.currentAnimation.currentFrame + 1) % this.currentAnimation.frames.length;
+                this.currentAnimation.lastFrameTime = currentTime;
+            }
+        }
+    }
+
+    getCurrentFrame() {
+        if (this.currentAnimation) {
+            return this.currentAnimation.frames[this.currentAnimation.currentFrame];
+        }
+        // Return a default frame or null if no animation is set
+        return null;
     }
 }

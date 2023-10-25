@@ -15,7 +15,7 @@ class FPSCounter {
         const currentTime = performance.now();
         const elapsedTime = currentTime - this.lastFrameTime;
 
-        if (elapsedTime >= 1000) {
+        if (elapsedTime >= 50) {
             this.fps = Math.round((this.frameCount * 100000) / elapsedTime) / 100;
             this.frameCount = 0;
             this.lastFrameTime = currentTime;

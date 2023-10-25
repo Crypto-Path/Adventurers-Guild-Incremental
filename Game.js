@@ -1,4 +1,5 @@
 class Game {
+
     constructor() {
         const FPS = 120;
         this.canvas = document.getElementById('PlayField');
@@ -21,6 +22,7 @@ class Game {
         this.frameCount = 0;
 
         this.ctrlDown = false;
+
 
         // Handle zoom
         window.addEventListener("resize", (e) => {
@@ -166,16 +168,15 @@ class Game {
     //Entity    (name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position)
     createEntity(name, hp, maxHp, level, xp, moveSpeed, position) {
         //Entity                    (name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position)
-        const newEntity = new Entity(name, hp, maxHp, level, xp, 10, 1.2, moveSpeed, 2, position);
+        const newEntity = new Entity(name, hp, maxHp, level, xp, 10, 1.2, moveSpeed, 2, position, (typeof animationsInstance !== 'undefined') ? animationsInstance : null);
+        //newEntity.entities[0].setAnimation("a")
         this.entities.push(newEntity);
+        newEntity.setAnimation("a")
         return newEntity;
     }
 
     createAdventurer(name, position) {
-        //Entity                    (name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position)
-        const newEntity = new Adventurer(name, 10, 10, 0, 0, 10, 1.2, 50, 2, position);
-        this.entities.push(newEntity);
-        return newEntity;
+        this.createEntity(name, 10, 10, 0, 0, 50, position)
     }
 
     drawDebugBox() {
@@ -183,39 +184,63 @@ class Game {
     }
 
     drawEntity(entity) {
-        // Draw entity
-        this.ctx.beginPath();
-        this.ctx.arc(
-            this.offsetX + entity.transform.vector2D.position.x * this.scale,
-            this.offsetY + entity.transform.vector2D.position.y * this.scale,
-            entity.size * this.scale,
-            0,
-            Math.PI * 2
-        );
-        this.ctx.fillStyle = 'blue';
-        this.ctx.fill();
-        this.ctx.closePath();
+        const currentFrame = entity.getCurrentFrame();
 
-        // Draw entity name above them
-        this.ctx.font = "16px Arial";
-        this.ctx.fillStyle = "white";
-        this.ctx.textAlign = "center";
-        this.ctx.fillText(entity.name, this.offsetX + entity.transform.vector2D.position.x * this.scale, this.offsetY + entity.transform.vector2D.position.y * this.scale - entity.size * this.scale - 10);
+        // Create a new Image object
+        let frame = new Image();
 
-        // Draw health bar below them
-        const healthBarWidth = 50; // Adjust the width of the health bar as needed
-        const healthBarHeight = 8;
-        const healthBarX = this.offsetX + entity.transform.vector2D.position.x * this.scale - healthBarWidth / 2;
-        const healthBarY = this.offsetY + entity.transform.vector2D.position.y * this.scale + entity.size * this.scale + 5;
-        const remainingHealthWidth = (entity.hp / entity.maxHp) * healthBarWidth;
+        // Set the image source to the currentFrame path
+        frame.src = currentFrame;
 
-        // Draw red background (missing health)
-        this.ctx.fillStyle = "red";
-        this.ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+        const entityScreenX = entity.transform.vector2D.position.x * this.scale + this.offsetX;
+        const entityScreenY = entity.transform.vector2D.position.y * this.scale + this.offsetY;
+        const scaledWidth = frame.width * entity.size * this.scale / 256;
+        const scaledHeight = frame.height * entity.size * this.scale / 256;
 
-        // Draw green health bar
-        this.ctx.fillStyle = "green";
-        this.ctx.fillRect(healthBarX, healthBarY, remainingHealthWidth, healthBarHeight);
+        // Check if the entity is within the screen boundaries
+        const screenLeft = 0;
+        const screenRight = this.canvas.width;
+        const screenTop = 0;
+        const screenBottom = this.canvas.height;
+
+        if (entityScreenX + scaledWidth / 2 > screenLeft && entityScreenX - scaledWidth / 2 < screenRight && entityScreenY + scaledHeight / 2 > screenTop && entityScreenY - scaledHeight / 2 < screenBottom) {
+            if (frame.src) {
+                // Calculate the scaled width and height of the image based on the entity's size and the overall scale
+                const scaledWidth = frame.width * entity.size * this.scale / 360;
+                const scaledHeight = frame.height * entity.size * this.scale / 360;
+
+                // Calculate the drawing position to center the image over the entity
+                const entityScreenX = entity.transform.vector2D.position.x * this.scale + this.offsetX;
+                const entityScreenY = entity.transform.vector2D.position.y * this.scale + this.offsetY;
+                const drawX = entityScreenX - scaledWidth / 2;
+                const drawY = entityScreenY - scaledHeight / 2;
+
+                // Draw the image at the calculated position
+                this.ctx.drawImage(frame, drawX, drawY, scaledWidth, scaledHeight);
+            }
+
+
+            // Draw entity name above them
+            this.ctx.font = "16px Arial";
+            this.ctx.fillStyle = "white";
+            this.ctx.textAlign = "center";
+            this.ctx.fillText(entity.name, this.offsetX + entity.transform.vector2D.position.x * this.scale, this.offsetY + entity.transform.vector2D.position.y * this.scale - entity.size * this.scale - 10);
+
+            // Draw health bar below them
+            const healthBarWidth = 50; // Adjust the width of the health bar as needed
+            const healthBarHeight = 8;
+            const healthBarX = this.offsetX + entity.transform.vector2D.position.x * this.scale - healthBarWidth / 2;
+            const healthBarY = this.offsetY + entity.transform.vector2D.position.y * this.scale + entity.size * this.scale + 5;
+            const remainingHealthWidth = (entity.hp / entity.maxHp) * healthBarWidth;
+
+            // Draw red background (missing health)
+            this.ctx.fillStyle = "red";
+            this.ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+            // Draw green health bar
+            this.ctx.fillStyle = "green";
+            this.ctx.fillRect(healthBarX, healthBarY, remainingHealthWidth, healthBarHeight);
+        }
     }
 
     drawBackground() {
@@ -266,9 +291,13 @@ class Game {
                 this.debugBox.text = this.hoveringEntity.getDebugInfo();
             }
         }
+
+        // Update entity animations
+        const currentTime = performance.now();
         this.fpsCounter.update();
         for (let i = 0; i < this.entities.length; i++) {
             const entity = this.entities[i];
+            entity.updateAnimation(currentTime);
             entity.update();
         }
     }
