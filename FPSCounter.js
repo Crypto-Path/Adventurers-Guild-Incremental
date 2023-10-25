@@ -7,7 +7,7 @@ class FPSCounter {
         this.lastFrameTime = performance.now();
         this.frameCount = 0;
         this.fps = 0;
-        this.bgColor = 'rgba(0, 0, 128, 0.8)'; // Light blue transparent background
+        this.bgColor = 'rgba(64, 64, 128, 0.5)'; // Light blue transparent background
     }
 
     update() {
@@ -23,16 +23,19 @@ class FPSCounter {
     }
 
     draw(ctx) {
-        const x = 10 + this.x;
+        const x = 20 + this.x;
         const y = ctx.canvas.height - 30 + this.y; // Bottom left corner
 
         // Draw the background
         ctx.fillStyle = this.bgColor;
         ctx.roundRect(x - 5, y - 20, this.width, 30, 10).fill();
 
+        // Set font size and text alignment
+        ctx.font = "16px Arial";
+        ctx.textAlign = "left"; // or "center" or "right" depending on your preference
+
         // Draw the FPS text
         ctx.fillStyle = "white";
-        ctx.font = "16px Arial";
         ctx.fillText(`${this.text}${this.fps}`, x, y);
     }
 }
