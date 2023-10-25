@@ -46,10 +46,12 @@ class Game {
                     limited = true;
                 }
 
-                if (!this.trackedEntity && !limited) {
-                    // If not tracking, adjust the offset based on mouse position
-                    this.offsetX += (e.offsetX - this.offsetX) * (1 - zoomFactor);
-                    this.offsetY += (e.offsetY - this.offsetY) * (1 - zoomFactor);
+                if (!this.trackedEntity) {
+                    if (!limited) {
+                        // If not tracking, adjust the offset based on mouse position
+                        this.offsetX += (e.offsetX - this.offsetX) * (1 - zoomFactor);
+                        this.offsetY += (e.offsetY - this.offsetY) * (1 - zoomFactor);
+                    }
                 } else {
                     // If tracking, zoom from the position of the tracked entity
                     this.offsetX = window.innerWidth / 2 - this.trackedEntity.transform.vector2D.position.x * this.scale;
@@ -165,6 +167,13 @@ class Game {
     createEntity(name, hp, maxHp, level, xp, moveSpeed, position) {
         //Entity                    (name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position)
         const newEntity = new Entity(name, hp, maxHp, level, xp, 10, 1.2, moveSpeed, 2, position);
+        this.entities.push(newEntity);
+        return newEntity;
+    }
+
+    createAdventurer(name, position) {
+        //Entity                    (name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position)
+        const newEntity = new Adventurer(name, 10, 10, 0, 0, 10, 1.2, 50, 2, position);
         this.entities.push(newEntity);
         return newEntity;
     }

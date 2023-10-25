@@ -6,7 +6,7 @@ const EntityState = {
 };
 
 class Entity {
-    constructor(name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position) {
+    constructor(name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position = { x: 0, y: 0 }) {
         this.name = name || "???";
         this.hp = hp || 0;
         this.maxHp = maxHp || 0;
