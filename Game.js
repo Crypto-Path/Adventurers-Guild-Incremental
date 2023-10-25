@@ -1,7 +1,7 @@
 class Game {
     constructor() {
         const FPS = 120;
-        this.canvas = document.getElementById('infiniteCanvas');
+        this.canvas = document.getElementById('PlayField');
         this.ctx = this.canvas.getContext('2d');
         this.offsetX = window.innerWidth / 2;
         this.offsetY = window.innerHeight / 2;
@@ -149,6 +149,7 @@ class Game {
     }
 
     drawEntity(entity) {
+        // Draw entity
         this.ctx.beginPath();
         this.ctx.arc(
             this.offsetX + entity.transform.vector2D.position.x * this.scale,
@@ -160,6 +161,27 @@ class Game {
         this.ctx.fillStyle = 'blue';
         this.ctx.fill();
         this.ctx.closePath();
+
+        // Draw entity name above them
+        this.ctx.font = "16px Arial";
+        this.ctx.fillStyle = "white";
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(entity.name, this.offsetX + entity.transform.vector2D.position.x * this.scale, this.offsetY + entity.transform.vector2D.position.y * this.scale - entity.size * this.scale - 10);
+
+        // Draw health bar below them
+        const healthBarWidth = 50; // Adjust the width of the health bar as needed
+        const healthBarHeight = 8;
+        const healthBarX = this.offsetX + entity.transform.vector2D.position.x * this.scale - healthBarWidth / 2;
+        const healthBarY = this.offsetY + entity.transform.vector2D.position.y * this.scale + entity.size * this.scale + 5;
+        const remainingHealthWidth = (entity.hp / entity.maxHp) * healthBarWidth;
+
+        // Draw red background (missing health)
+        this.ctx.fillStyle = "red";
+        this.ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+        // Draw green health bar
+        this.ctx.fillStyle = "green";
+        this.ctx.fillRect(healthBarX, healthBarY, remainingHealthWidth, healthBarHeight);
     }
 
     drawBackground() {
