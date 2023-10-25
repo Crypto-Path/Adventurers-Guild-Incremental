@@ -20,6 +20,8 @@ class Game {
         this.drawFpsCounter = new FPSCounter("Draw FPS: ", 0, 0, 140);
         this.frameCount = 0;
 
+        this.ctrlDown = false;
+
         // Handle zoom
         window.addEventListener("resize", (e) => {
             this.canvas.width = window.innerWidth;
@@ -29,20 +31,34 @@ class Game {
 
         // Handle zoom
         this.canvas.addEventListener('wheel', (e) => {
-            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1; // Zoom out for scroll down, zoom in for scroll up
-            this.scale *= zoomFactor;
-            this.scale = this.scale.toFixed(2);
+            if (!this.ctrlDown) {
+                const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1; // Zoom out for scroll down, zoom in for scroll up
+                this.scale *= zoomFactor;
+                this.scale = this.scale.toFixed(3);
 
-            if (!this.trackedEntity) {
-                // If not tracking, adjust the offset based on mouse position
-                this.offsetX += (e.offsetX - this.offsetX) * (1 - zoomFactor);
-                this.offsetY += (e.offsetY - this.offsetY) * (1 - zoomFactor);
-            } else {
-                // If tracking, zoom from the position of the tracked entity
-                this.offsetX = window.innerWidth / 2 - this.trackedEntity.transform.vector2D.position.x * this.scale;
-                this.offsetY = window.innerHeight / 2 - this.trackedEntity.transform.vector2D.position.y * this.scale;
-                this.drawEntity(this.trackedEntity);
+                let limited = false;
+                // Limit zoom out to a scale factor of 0.1
+                if (this.scale > 20) {
+                    this.scale = 20;
+                    limited = true;
+                } else if (this.scale < 0.02) {
+                    this.scale = 0.02;
+                    limited = true;
+                }
+
+                if (!this.trackedEntity && !limited) {
+                    // If not tracking, adjust the offset based on mouse position
+                    this.offsetX += (e.offsetX - this.offsetX) * (1 - zoomFactor);
+                    this.offsetY += (e.offsetY - this.offsetY) * (1 - zoomFactor);
+                } else {
+                    // If tracking, zoom from the position of the tracked entity
+                    this.offsetX = window.innerWidth / 2 - this.trackedEntity.transform.vector2D.position.x * this.scale;
+                    this.offsetY = window.innerHeight / 2 - this.trackedEntity.transform.vector2D.position.y * this.scale;
+                    this.drawEntity(this.trackedEntity);
+                }
+                return;
             }
+            e.preventDefault();
         });
 
         // Handle pan
@@ -117,6 +133,15 @@ class Game {
             if (event.keyCode === 114) {
                 this.isFPSVisible = !this.isFPSVisible;
                 event.preventDefault();
+            }
+            if (event.keyCode === 17) {
+                this.ctrlDown = true;
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            if (event.keyCode === 17) {
+                this.ctrlDown = false;
             }
         });
 
