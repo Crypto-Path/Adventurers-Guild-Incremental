@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Pan and Zoom Canvas with Entity</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="infiniteCanvas"></canvas>
+    <!-- Engine -->
+    <script src="Vector2D.js"></script>
+    <script src="Scale2D.js"></script>
+    <script src="Rotation2D.js"></script>
+    <script src="Transform.js"></script>
+    <script src="Entity.js"></script>
+    <script src="DebugBox.js"></script>
+    <script src="FPSCounter.js"></script>
+    <script src="Random.js"></script>
+
+    <!-- Custom Classes -->
+    <script src="Entities/Adventurer.js"></script>
+    <script src="Scripts/RandomNameGenerator.js"></script>
+
+    <!--The Game-->
+    <script src="Game.js"></script>
+    <script>
+        // Instantiate the game
+        const game = new Game();
+
+        // Example usage
+        const nameGenerator = new RandomNameGenerator();
+        nameGenerator.setLang("jp");
+
+        game.createEntity("Hiro Valorheart", 10, 10, 0, 0, 50, {
+            x: 0,
+            y: 0
+        });
+
+        function generateAdventurer() {
+            nameGenerator.setGender((Math.random() - 0.5 < 0) ? "male" : "female");
+            game.createEntity(nameGenerator.generateName(), 10, 10, 0, 0, 50, {
+                x: 0,
+                y: 0
+            });
+        }
+    </script>
+</body>
+
+</html>
