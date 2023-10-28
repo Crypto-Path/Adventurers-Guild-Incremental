@@ -11,15 +11,7 @@ class DebugBox {
     draw(ctx) {
         // Split text into lines
         const lines = this.text.split('\n');
-
-        // Calculate wrapped text and box height
-        const wrappedText = this.wrapText(ctx, this.text, this.width - this.padding * 2, 16);
-        const textHeight = wrappedText.length * 20; // Assuming font size is 16px and line height is 20px
-
-        // Extend box height if necessary
-        if (textHeight + this.padding * 3 > this.height) {
-            this.height = textHeight + this.padding * 3;
-        }
+        this.height = lines.length * 20 + this.padding;
 
         // Draw white outline
         ctx.beginPath();
@@ -49,36 +41,4 @@ class DebugBox {
             ctx.fillText(lines[i], this.x + this.padding, this.y + this.padding + i * 20);
         }
     }
-
-    wrapText(ctx, text, maxWidth, lineHeight) {
-        let words = text.split(' ');
-        let lines = [];
-        let currentLine = words[0];
-
-        for (let i = 1; i < words.length; i++) {
-            let word = words[i];
-            let width = ctx.measureText(currentLine + ' ' + word).width;
-            if (width < maxWidth) {
-                currentLine += ' ' + word;
-            } else {
-                lines.push(currentLine);
-                currentLine = word;
-            }
-        }
-
-        lines.push(currentLine);
-        return lines;
-    }
 }
-
-// Extend canvas context with roundRect function
-CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
-    this.beginPath();
-    this.moveTo(x + radius, y);
-    this.arcTo(x + width, y, x + width, y + height, radius);
-    this.arcTo(x + width, y + height, x, y + height, radius);
-    this.arcTo(x, y + height, x, y, radius);
-    this.arcTo(x, y, x + width, y, radius);
-    this.closePath();
-    return this;
-};

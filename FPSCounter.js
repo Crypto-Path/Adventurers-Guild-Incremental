@@ -36,7 +36,7 @@ class FPSCounter {
 
         // Draw the FPS text
         ctx.fillStyle = "white";
-        ctx.fillText(`${this.text}${this.fps}`, x, y);
+        ctx.fillText(`${this.text}${this.fps}`, x, y - 8);
     }
 }
 

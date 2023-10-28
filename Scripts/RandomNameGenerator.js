@@ -114,13 +114,7 @@ class RandomNameGenerator {
 
         const selectedLanguageData = (this.selectedLanguage != null) ? this.languages[this.selectedLanguage] : this.getRandomItem(this.languages);
         let firstName;
-        if (this.selectedGender === "male") {
-            firstName = this.getRandomItem(selectedLanguageData.maleFirstNames);
-        } else if (this.selectedGender === "female") {
-            firstName = this.getRandomItem(selectedLanguageData.femaleFirstNames);
-        } else {
-            firstName = this.getRandomItem(selectedLanguageData.firstNames);
-        }
+        firstName = this.getRandomItem((this.selectedGender === "male") ? selectedLanguageData.maleFirstNames : selectedLanguageData.femaleFirstNames);
         const lastName = this.getRandomItem(selectedLanguageData.lastNames);
 
         return `${firstName} ${lastName}`;

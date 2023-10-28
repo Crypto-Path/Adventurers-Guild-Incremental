@@ -16,7 +16,3 @@ class Animations {
         return this.animations[animationTitle];
     }
 }
-
-// Initialize Animations
-const animationsInstance = new Animations();
-animationsInstance.createAnimation("a", ["Resources/Adventurer/Temp.png"], 1);

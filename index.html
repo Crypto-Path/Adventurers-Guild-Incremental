@@ -20,6 +20,7 @@
 <body>
     <canvas id="PlayField"></canvas>
     <!-- Engine -->
+    <script src="Random.js"></script>
     <script src="Vector2D.js"></script>
     <script src="Scale2D.js"></script>
     <script src="Rotation2D.js"></script>
@@ -28,7 +29,6 @@
     <script src="Entity.js"></script>
     <script src="DebugBox.js"></script>
     <script src="FPSCounter.js"></script>
-    <script src="Random.js"></script>
 
     <!-- Custom Classes -->
     <script src="Entities/Adventurer.js"></script>
@@ -37,25 +37,17 @@
     <!--The Game-->
     <script src="Game.js"></script>
     <script>
+        // Initialize Animations
+        const animationsInstance = new Animations();
+        animationsInstance.createAnimation("Adventurer-Walking-Left", ["Resources/Adventurer/Walking_Left_1.png", "Resources/Adventurer/Walking_Left_2.png", "Resources/Adventurer/Walking_Left_3.png", "Resources/Adventurer/Walking_Left_4.png"], 4);
+        animationsInstance.createAnimation("Adventurer-Walking-Right", ["Resources/Adventurer/Walking_Right_1.png", "Resources/Adventurer/Walking_Right_2.png", "Resources/Adventurer/Walking_Right_3.png", "Resources/Adventurer/Walking_Right_4.png"], 4);
+        animationsInstance.createAnimation("Adventurer-Idle", ["Resources/Adventurer/Idle_1.png", "Resources/Adventurer/Idle_2.png"], 2);
+
         // Instantiate the game
-        const game = new Game();
+        /*const game = */
+        new Game();
 
         // Example usage
-        const nameGenerator = new RandomNameGenerator();
-
-        game.createEntity("Hiro Valorheart", 10, 10, 0, 0, 50, {
-            x: 0,
-            y: 0
-        });
-
-        function generateAdventurer() {
-            nameGenerator.setLang((Math.random() < 0.5) ? "jp" : "en");
-            nameGenerator.setGender((Math.random() < 0.5) ? "male" : "female");
-            game.createAdventurer(nameGenerator.generateName(), {
-                x: 0,
-                y: 0
-            });
-        }
     </script>
 </body>
 
