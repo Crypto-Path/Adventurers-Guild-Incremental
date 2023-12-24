@@ -8,7 +8,7 @@ const EntityState = {
 const random = new Random();
 
 class Entity {
-    constructor(name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position = { x: 0, y: 0 }, animations = null) {
+    constructor(name, hp, maxHp, level, xp, xpBase, xpExponent, moveSpeed, range, position = { x: 0, y: 0 }) {
         this.name = name || "???";
         this.hp = hp || 0;
         this.maxHp = maxHp || 0;
@@ -49,7 +49,7 @@ class Entity {
         };
     }
 
-    update() {
+    update(deltaTime) {
         this.lifeSpan++;
         if (this.currentState === EntityState.HUNTING) {
             // TODO: Implement hunting logic
@@ -61,7 +61,7 @@ class Entity {
 
             if (distance > 1) {
                 const wiggleAmount = ((this.traits.drunkard) ? Math.ceil(Math.sin(Math.cos((this.lifeSpan / 20) % 10)) - 0.5) : Math.sin(this.lifeSpan / 100)) * 0.5 * distance;
-                this.moveToward(dx + wiggleAmount, dy - wiggleAmount, distance);
+                this.moveToward(dx + wiggleAmount, dy - wiggleAmount, distance, deltaTime);
             } else {
 
                 this.currentState = EntityState.IDLING;
@@ -115,8 +115,8 @@ class Entity {
         // ...
     }
 
-    moveToward(dx, dy, distance) {
-        const speed = this.moveSpeed / 1000 * 16 * ((this.traits.drunkard) ? 0.8 : ((this.traits.drunkard) ? 1.2 : 1));
+    moveToward(dx, dy, distance, deltaTime) {
+        const speed = this.moveSpeed * (deltaTime / 10) * 16 * ((this.traits.drunkard) ? 0.8 : ((this.traits.drunkard) ? 1.2 : 1));
         const ratio = speed / distance;
         this.transform.vector2D.position.x += dx * ratio;
         this.transform.vector2D.position.y += dy * ratio;
@@ -233,7 +233,13 @@ State: ${this.currentState}`;
         this.traits = traits;
     }
 
-    // addTrait(trait){
-    //     this.traits.
-    // }
+    isCollidingWith(entity) {
+        // Check AABB collision
+        return (
+            this.transform.vector2D.position.x < entity.transform.vector2D.position.x + entity.size &&
+            this.transform.vector2D.position.x + this.size > entity.transform.vector2D.position.x &&
+            this.transform.vector2D.position.y < entity.transform.vector2D.position.y + entity.size &&
+            this.transform.vector2D.position.y + this.size > entity.transform.vector2D.position.y
+        );
+    }
 }

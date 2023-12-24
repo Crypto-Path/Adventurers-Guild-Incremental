@@ -7,7 +7,7 @@ class Scale2D {
         return this.scale.x;
     }
 
-    getYscale() {
+    getYScale() {
         return this.scale.y;
     }
 }

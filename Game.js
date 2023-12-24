@@ -30,9 +30,11 @@ class Game {
         this.drawFpsCounter = new FPSCounter("Draw FPS: ", 0, 0, 140);
         this.frameCount = 0;
 
+        this.lastFrameTime = performance.now();
+
         this.ctrlDown = false;
 
-        console.log(this.hero = this.createEntity("Hiro Valorheart", 10, 10, 0, 0, 50, {
+        console.log(this.hero = this.createAdventurer("Hiro Valorheart", {
             x: 0,
             y: 0
         }));
@@ -41,13 +43,12 @@ class Game {
 
         this.nameGenerator = new RandomNameGenerator();
 
-        for (let i = 0; i < 99; i++) {
-            const entity = this.generateAdventurer()
-            entity.randomizeTraits();
-            entity.transform.vector2D = new Vector2D((Math.random() - 0.5) * 2500, (Math.random() - 0.5) * 2500);
-            entity.targetPosition = { x: entity.transform.vector2D.position.x, y: entity.transform.vector2D.position.y };
-            console.log(entity);
-        }
+        // for (let i = 0; i < 0; i++) {
+        //     const entity = this.generateAdventurer()
+        //     entity.randomizeTraits();
+        //     entity.transform.vector2D = new Vector2D((Math.random() - 0.5) * 25, (Math.random() - 0.5) * 25);
+        //     entity.targetPosition = { x: entity.transform.vector2D.position.x, y: entity.transform.vector2D.position.y };
+        // }
 
         // Handle zoom
         window.addEventListener("resize", (e) => {
@@ -241,11 +242,17 @@ class Game {
     }
 
     createAdventurer(name, position) {
+        const newEntity = new Adventurer(name, position);
+        this.entities.push(newEntity);
+        newEntity.setAnimation("Adventurer-Idle")
+        return newEntity;
         const entity = this.createEntity(name, 10, 10, 0, 0, 50, position);
         return entity;
     }
 
     update() {
+        const currentTime = performance.now();
+        const deltaTime = (currentTime - this.lastFrameTime) / 1000; // Delta time in seconds
         this.frameCount++;
         if (this.trackedEntity) {
             // Adjust the offset based on the tracked entity's position
@@ -262,17 +269,30 @@ class Game {
             }
         }
 
-        // Update entity animations
-        const currentTime = performance.now();
         this.fpsCounter.update();
         for (let i = 0; i < this.entities.length; i++) {
             const entity = this.entities[i];
+            // TODO:
+            // Change this for entities to look for object
+            // for (let j = 0; j < this.entities.length; j++) {
+            //     if (i !== j) {
+            //         const otherEntity = this.entities[j];
+            //         if (entity.isCollidingWith(otherEntity)) {
+            //             // TODO:
+            //             // Make it so entities return to their previous position or something
+            //         }
+            //     }
+            // }
             entity.updateAnimation(currentTime);
-            entity.update();
+            entity.update(deltaTime);
         }
+        this.lastFrameTime = currentTime;
     }
 
     draw() {
+
+        this.entities.sort((a, b) => a.transform.vector2D.position.y - b.transform.vector2D.position.y);
+
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -362,10 +382,6 @@ class Game {
 
         if (entityScreenX + scaledWidth / 2 > this.screenLeft && entityScreenX - scaledWidth / 2 < this.screenRight && entityScreenY + scaledHeight / 2 > this.screenTop && entityScreenY - scaledHeight / 2 < this.screenBottom) {
             if (frame.src) {
-
-                // Calculate the drawing position to center the image over the entity
-                // const entityScreenX = entity.transform.vector2D.position.x * this.scale + this.offsetX;
-                // const entityScreenY = entity.transform.vector2D.position.y * this.scale + this.offsetY;
                 const drawX = entityScreenX - scaledWidth / 2;
                 const drawY = entityScreenY - scaledHeight / 2;
 

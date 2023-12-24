@@ -30,4 +30,36 @@ class Transform {
         // If the angle is between 337.5 and 360 or 0 and 22.5, it corresponds to 'N'
         return 'N';
     }
+
+    moveToward(targetX, targetY, speed) {
+        const dx = targetX - this.vector2D.position.x;
+        const dy = targetY - this.vector2D.position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 0) {
+            const ratio = Math.min(speed / distance, 1);
+            this.vector2D.position.x += dx * ratio;
+            this.vector2D.position.y += dy * ratio;
+        }
+    }
+
+    moveForward(distance, speed) {
+        const radian = this.rotation2D.getRotRad();
+        const dx = Math.cos(radian) * distance;
+        const dy = Math.sin(radian) * distance;
+
+        const ratio = speed / distance;
+        this.vector2D.position.x += dx * ratio;
+        this.vector2D.position.y += dy * ratio;
+    }
+
+    moveRight(distance, speed) {
+        const radian = this.rotation2D.getRotRad() + Math.PI / 2;
+        const dx = Math.cos(radian) * distance;
+        const dy = Math.sin(radian) * distance;
+
+        const ratio = speed / distance;
+        this.vector2D.position.x += dx * ratio;
+        this.vector2D.position.y += dy * ratio;
+    }
 }
